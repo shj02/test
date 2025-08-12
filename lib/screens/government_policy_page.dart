@@ -4,6 +4,7 @@ import 'main_page.dart';
 import 'ad_creation_page.dart';
 import 'revenue_analysis_page.dart';
 import 'mypage.dart';
+import 'ai_chat_page.dart';
 
 class GovernmentPolicyPage extends StatefulWidget {
   const GovernmentPolicyPage({super.key});
@@ -456,15 +457,24 @@ class _GovernmentPolicyPageState extends State<GovernmentPolicyPage> {
   }
 
   Widget _buildMicButton() {
-    return Container(
-      width: 60,
-      height: 60,
-      child: Center(
-        child: Image.asset(
-          'assets/images/mic.png',
-          width: 60,
-          height: 60,
-          fit: BoxFit.contain,
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(context, PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) => const AiChatPage(),
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
+        ));
+      },
+      child: Container(
+        width: 60,
+        height: 60,
+        child: Center(
+          child: Image.asset(
+            'assets/images/navMic.png',
+            width: 60,
+            height: 60,
+            fit: BoxFit.contain,
+          ),
         ),
       ),
     );

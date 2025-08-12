@@ -4,6 +4,11 @@ import 'main_page.dart';
 import 'login_page.dart';
 import 'ad_creation_page.dart';
 import 'revenue_analysis_page.dart';
+import 'ai_chat_page.dart';
+import 'inquiry_page.dart';
+import 'withdraw_page.dart';
+import 'signup_page.dart';
+import 'edit_profile_page.dart';
 
 class MyPage extends StatefulWidget {
   const MyPage({super.key});
@@ -186,23 +191,23 @@ class _MyPageState extends State<MyPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  '박준엽님',
-                  style: GoogleFonts.inter(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                    color: const Color(0xFF333333),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Tel. 010-1234-5678',
-                  style: GoogleFonts.inter(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                    color: const Color(0xFF999999),
-                  ),
-                ),
+                                 Text(
+                   '${UserData.name}님',
+                   style: GoogleFonts.inter(
+                     fontSize: 20,
+                     fontWeight: FontWeight.w700,
+                     color: const Color(0xFF333333),
+                   ),
+                 ),
+                 const SizedBox(height: 4),
+                 Text(
+                   'Tel. ${UserData.phone}',
+                   style: GoogleFonts.inter(
+                     fontSize: 16,
+                     fontWeight: FontWeight.w400,
+                     color: const Color(0xFF999999),
+                   ),
+                 ),
               ],
             ),
           ),
@@ -230,10 +235,10 @@ class _MyPageState extends State<MyPage> {
             ),
           ),
           const SizedBox(height: 20),
-          _buildInfoRow('이름', '박준엽'),
-          _buildInfoRow('생년월일', '2005-11-15'),
-          _buildInfoRow('전화번호', '010-1234-5678'),
-          _buildInfoRow('이메일', 'subinp5537@gmail.com'),
+                                          _buildInfoRow('이름', UserData.name),
+            _buildInfoRow('생년월일', UserData.birthDate),
+            _buildInfoRow('전화번호', UserData.phone),
+            _buildInfoRow('이메일', UserData.email),
         ],
       ),
     );
@@ -258,11 +263,11 @@ class _MyPageState extends State<MyPage> {
             ),
           ),
           const SizedBox(height: 20),
-          _buildInfoRow('가게명', '준엽이의 한식'),
-          _buildInfoRow('업종', '한식당'),
-          _buildInfoRow('사업자번호', '123-456-78901'),
-          _buildInfoRow('주소', '인천광역시00구 00동'),
-          _buildInfoRow('번호', '032-1234-5678'),
+          _buildInfoRow('가게명', UserData.businessName),
+          _buildInfoRow('업종', UserData.businessType),
+          _buildInfoRow('사업자번호', UserData.businessNumber),
+          _buildInfoRow('주소', UserData.address),
+          _buildInfoRow('번호', UserData.businessPhone),
         ],
       ),
     );
@@ -287,11 +292,34 @@ class _MyPageState extends State<MyPage> {
             ),
           ),
           const SizedBox(height: 20),
-          _buildMenuRow('정보 수정하기', () {
-            // 정보 수정 페이지로 이동
-          }),
+                     _buildMenuRow('정보 수정하기', () async {
+             // 정보 수정 페이지로 이동
+             final result = await Navigator.push(
+               context,
+               PageRouteBuilder(
+                 pageBuilder: (context, animation, secondaryAnimation) => const EditProfilePage(),
+                 transitionDuration: Duration.zero,
+                 reverseTransitionDuration: Duration.zero,
+               ),
+             );
+             
+             // 정보가 수정되었으면 마이페이지 새로고침
+             if (result == true) {
+               setState(() {
+                 // setState를 호출하여 UI를 새로고침
+               });
+             }
+           }),
           _buildMenuRow('문의사항', () {
             // 문의사항 페이지로 이동
+            Navigator.pushReplacement(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) => const InquiryPage(),
+                transitionDuration: Duration.zero,
+                reverseTransitionDuration: Duration.zero,
+              ),
+            );
           }),
           _buildMenuRow('로그아웃', () {
             // 로그아웃 처리
@@ -365,107 +393,7 @@ class _MyPageState extends State<MyPage> {
     );
   }
 
-  void _showLogoutDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            '로그아웃',
-            style: GoogleFonts.inter(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          content: Text(
-            '정말 로그아웃 하시겠습니까?',
-            style: GoogleFonts.inter(),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(
-                '취소',
-                style: GoogleFonts.inter(
-                  color: Colors.grey,
-                ),
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.pushReplacement(
-                  context,
-                  PageRouteBuilder(
-                    pageBuilder: (context, animation, secondaryAnimation) => const LoginPage(),
-                    transitionDuration: Duration.zero,
-                    reverseTransitionDuration: Duration.zero,
-                  ),
-                );
-              },
-              child: Text(
-                '로그아웃',
-                style: GoogleFonts.inter(
-                  color: Colors.red,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
 
-  void _showWithdrawDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            '탈퇴하기',
-            style: GoogleFonts.inter(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          content: Text(
-            '정말 탈퇴하시겠습니까?\n이 작업은 되돌릴 수 없습니다.',
-            style: GoogleFonts.inter(),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(
-                '취소',
-                style: GoogleFonts.inter(
-                  color: Colors.grey,
-                ),
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.pushReplacement(
-                  context,
-                  PageRouteBuilder(
-                    pageBuilder: (context, animation, secondaryAnimation) => const LoginPage(),
-                    transitionDuration: Duration.zero,
-                    reverseTransitionDuration: Duration.zero,
-                  ),
-                );
-              },
-              child: Text(
-                '탈퇴',
-                style: GoogleFonts.inter(
-                  color: Colors.red,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   Widget _buildBottomNavigation() {
     return Container(
@@ -566,16 +494,142 @@ class _MyPageState extends State<MyPage> {
   }
 
   Widget _buildMicButton() {
-    return Container(
-      width: 60,
-      height: 60,
-      child: Center(
-        child: Image.asset(
-          'assets/images/mic.png',
-          width: 60,
-          height: 60,
-          fit: BoxFit.contain,
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(context, PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) => const AiChatPage(),
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
+        ));
+      },
+      child: Container(
+        width: 60,
+        height: 60,
+        child: Center(
+          child: Image.asset(
+            'assets/images/navMic.png',
+            width: 60,
+            height: 60,
+            fit: BoxFit.contain,
+          ),
         ),
+      ),
+    );
+  }
+
+  // 로그아웃 다이얼로그 표시
+  void _showLogoutDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          child: Container(
+            width: 300,
+            height: 160,
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: 10),
+                Text(
+                  '로그아웃 하시겠습니까?',
+                  style: GoogleFonts.inter(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFF666666),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).pop(); // 다이얼로그 닫기
+                        },
+                                                 child: Container(
+                           height: 43,
+                           decoration: BoxDecoration(
+                             color: Colors.white,
+                             border: Border.all(
+                               color: const Color(0xFFE5E5E5),
+                               width: 1,
+                             ),
+                             borderRadius: BorderRadius.circular(5),
+                           ),
+                          child: Center(
+                            child: Text(
+                              '취소',
+                              style: GoogleFonts.inter(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w700,
+                                color: const Color(0xFF00C2FD),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).pop(); // 다이얼로그 닫기
+                          // 로그아웃 처리 후 로그인 페이지로 이동
+                          Navigator.pushReplacement(
+                            context,
+                            PageRouteBuilder(
+                              pageBuilder: (context, animation, secondaryAnimation) => const LoginPage(),
+                              transitionDuration: Duration.zero,
+                              reverseTransitionDuration: Duration.zero,
+                            ),
+                          );
+                        },
+                        child: Container(
+                          height: 43,
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF98E0F8), Color(0xFF9CCEFF)],
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                            ),
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          child: Center(
+                            child: Text(
+                              '확인',
+                              style: GoogleFonts.inter(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // 탈퇴 다이얼로그 표시
+  void _showWithdrawDialog() {
+    Navigator.push(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) => const WithdrawPage(),
+        transitionDuration: Duration.zero,
+        reverseTransitionDuration: Duration.zero,
       ),
     );
   }

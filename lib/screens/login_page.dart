@@ -70,17 +70,6 @@ class LoginPage extends StatelessWidget {
               // 소셜 로그인 버튼들
               _buildSocialLoginButton(
                 context,
-                'Google로 계속하기',
-                'assets/images/google.png',
-                Colors.white,
-                Colors.black87,
-                () => _handleGoogleLogin(context),
-              ),
-              
-              const SizedBox(height: 10),
-              
-              _buildSocialLoginButton(
-                context,
                 '카카오로 계속하기',
                 'assets/images/kakao.png',
                 const Color(0xFFFEE500),
@@ -151,18 +140,6 @@ class LoginPage extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  void _handleGoogleLogin(BuildContext context) {
-    // Google 로그인 로직 (시뮬레이션)
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Google 로그인 처리 중...')),
-    );
-    
-    // 잠시 후 가입정보 페이지로 이동
-    Future.delayed(const Duration(seconds: 1), () {
-      Navigator.pushReplacementNamed(context, '/signup');
-    });
   }
 
   void _handleKakaoLogin(BuildContext context) {

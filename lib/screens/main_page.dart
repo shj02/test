@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'ad_creation_page.dart';
+import 'revenue_analysis_page.dart';
+import 'review_analysis_page.dart';
+import 'government_policy_page.dart';
+import 'mypage.dart';
+import 'ai_chat_page.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -35,9 +41,6 @@ class _MainPageState extends State<MainPage> {
                     
                     // 매출 분석 섹션
                     _buildRevenueSection(),
-                    
-                    // 매출 카드들
-                    _buildRevenueCards(),
                     
                     const SizedBox(height: 20),
                   ],
@@ -183,7 +186,7 @@ class _MainPageState extends State<MainPage> {
                   'AI를 통한 광고 생성',
                   Icons.create,
                   const Color(0xFF333333),
-                  imagePath: 'assets/images/adIcon.png',
+                  imagePath: 'assets/images/ad.png',
                 ),
               ),
               const SizedBox(width: 16),
@@ -193,7 +196,7 @@ class _MainPageState extends State<MainPage> {
                   'AI를 통한 매출분석',
                   Icons.trending_up,
                   const Color(0xFF333333),
-                  imagePath: 'assets/images/revenueIcon.png',
+                  imagePath: 'assets/images/revenue.png',
                 ),
               ),
             ],
@@ -207,7 +210,7 @@ class _MainPageState extends State<MainPage> {
                   'AI를 통한 리뷰 분석',
                   Icons.rate_review,
                   const Color(0xFF333333),
-                  imagePath: 'assets/images/reviewIcon.png',
+                  imagePath: 'assets/images/review.png',
                 ),
               ),
               const SizedBox(width: 16),
@@ -217,7 +220,7 @@ class _MainPageState extends State<MainPage> {
                   '정부정책 확인',
                   Icons.policy,
                   const Color(0xFF333333),
-                  imagePath: 'assets/images/governmentIcon.png',
+                  imagePath: 'assets/images/government.png',
                 ),
               ),
             ],
@@ -229,17 +232,33 @@ class _MainPageState extends State<MainPage> {
 
   Widget _buildMenuCard(String title, String subtitle, IconData icon, Color color, {String? imagePath}) {
     return GestureDetector(
-      onTap: () {
-        if (title == '광고생성') {
-          Navigator.pushNamed(context, '/ad_creation');
-        } else if (title == '매출분석') {
-          Navigator.pushNamed(context, '/revenue_analysis');
-        } else if (title == '리뷰분석') {
-          Navigator.pushNamed(context, '/review_analysis');
-        } else if (title == '정부정책') {
-          Navigator.pushNamed(context, '/government_policy');
-        }
-      },
+             onTap: () {
+         if (title == '광고생성') {
+           Navigator.push(context, PageRouteBuilder(
+             pageBuilder: (context, animation, secondaryAnimation) => AdCreationPage(),
+             transitionDuration: Duration.zero,
+             reverseTransitionDuration: Duration.zero,
+           ));
+         } else if (title == '매출분석') {
+           Navigator.push(context, PageRouteBuilder(
+             pageBuilder: (context, animation, secondaryAnimation) => RevenueAnalysisPage(),
+             transitionDuration: Duration.zero,
+             reverseTransitionDuration: Duration.zero,
+           ));
+         } else if (title == '리뷰분석') {
+           Navigator.push(context, PageRouteBuilder(
+             pageBuilder: (context, animation, secondaryAnimation) => ReviewAnalysisPage(),
+             transitionDuration: Duration.zero,
+             reverseTransitionDuration: Duration.zero,
+           ));
+         } else if (title == '정부정책') {
+           Navigator.push(context, PageRouteBuilder(
+             pageBuilder: (context, animation, secondaryAnimation) => GovernmentPolicyPage(),
+             transitionDuration: Duration.zero,
+             reverseTransitionDuration: Duration.zero,
+           ));
+         }
+       },
       child: Container(
         height: 154,
         decoration: BoxDecoration(
@@ -295,125 +314,208 @@ class _MainPageState extends State<MainPage> {
   Widget _buildRevenueSection() {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: const Color(0xFF12131F),
-        borderRadius: BorderRadius.circular(21),
-      ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              const Text(
-                '이번달 총 매출',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                  color: Color(0xCCFFFFFF),
-                ),
-              ),
-              const Spacer(),
-              Row(
-                children: [
-                  SizedBox(
-                    height: 25,
-                    child: Icon(
-                      Icons.trending_up,
-                      color: const Color(0xFFB1FFCE),
-                      size: 20,
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  SizedBox(
-                    height: 20,
-                    child: const Text(
-                      '+40.2%',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
-                        color: Color(0xFFB1FFCE),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 1),
-          const Text(
-            '52,003,000원',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w400,
-              color: Colors.white,
-              height: 1.0,
-            ),
-          ),
-          const SizedBox(height: 20),
+          // 매출분석 헤더 (Figma 디자인과 동일)
           Container(
-            height: 2,
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.3),
-              borderRadius: BorderRadius.circular(4.5),
+            height: 37,
+            child: Row(
+              children: [
+                Text(
+                  '매출분석',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFF6B6A6F),
+                    letterSpacing: -0.9,
+                  ),
+                ),
+                const Spacer(),
+                                 GestureDetector(
+                   onTap: () {
+                     Navigator.push(context, PageRouteBuilder(
+                       pageBuilder: (context, animation, secondaryAnimation) => RevenueAnalysisPage(),
+                       transitionDuration: Duration.zero,
+                       reverseTransitionDuration: Duration.zero,
+                     ));
+                   },
+                   child: Row(
+                     children: [
+                       Text(
+                         '더보기',
+                         style: TextStyle(
+                           fontSize: 12,
+                           fontWeight: FontWeight.w400,
+                           color: const Color(0xFF999999),
+                           letterSpacing: -0.6,
+                         ),
+                       ),
+                       const SizedBox(width: 8),
+                       Transform.rotate(
+                         angle: 3.14159, // 180도 회전 (π radians)
+                         child: Image.asset(
+                           'assets/images/arrow.png',
+                           width: 7,
+                           height: 8,
+                           fit: BoxFit.contain,
+                         ),
+                       ),
+                     ],
+                   ),
+                 ),
+              ],
             ),
           ),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildRevenueItem('총주문', '423'),
-              _buildRevenueItem('방문인원', '232'),
-              _buildRevenueItem('리뷰', '4.95'),
-            ],
-          ),
+          
+          const SizedBox(height: 12),
+          
+          // 큰 매출 카드 (이번달 총 매출)
+          _buildMainRevenueCard(),
+          
+          const SizedBox(height: 5),
+          
+          // 작은 매출 카드들
+          _buildRevenueCards(),
         ],
       ),
     );
   }
 
-  Widget _buildRevenueItem(String label, String value) {
-    return Column(
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w400,
-            color: Color(0xCCFFFFFF),
-          ),
+  Widget _buildMainRevenueCard() {
+    return Container(
+      height: 180,
+      decoration: BoxDecoration(
+        color: const Color(0xFF12131F),
+        borderRadius: BorderRadius.circular(21),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 이번달 총 매출 텍스트
+            Text(
+              '이번달 총 매출',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                color: Colors.white.withOpacity(0.8),
+                letterSpacing: 0,
+              ),
+            ),
+            const SizedBox(height: 2),
+            
+                          // 금액과 퍼센트
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '52,003,000원',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                      letterSpacing: -1.1,
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      Image.asset(
+                        'assets/images/mainRevenueUP.png',
+                        width: 26,
+                        height: 14,
+                        fit: BoxFit.contain,
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        '+40.2%',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                          color: const Color(0xFFB1FFCE),
+                          letterSpacing: -0.8,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            
+            const SizedBox(height: 10),
+            
+            // 차트 이미지 (플레이스홀더)
+            Container(
+              width: double.infinity,
+              height: 3,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(4.5),
+              ),
+            ),
+            
+            const SizedBox(height: 10),
+            
+            // 통계 정보들
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _buildStatItem('총주문', '423'),
+                _buildStatItem('방문인원', '232'),
+                _buildStatItem('리뷰', '4.95'),
+              ],
+            ),
+          ],
         ),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w400,
-            color: Colors.white,
+      ),
+    );
+  }
+
+  Widget _buildStatItem(String label, String value) {
+    return Expanded(
+      child: Column(
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w400,
+              color: Colors.white.withOpacity(0.8),
+              letterSpacing: -0.8,
+            ),
           ),
-        ),
-      ],
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w800,
+              color: Colors.white,
+              letterSpacing: -1.1,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildRevenueCards() {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      margin: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
         children: [
           Expanded(
-            child: _buildRevenueCard('오늘 매출', '+ 8.2%', 'assets/images/todayup.png', const Color(0xFF4CAF50)),
+            child: _buildRevenueCard('오늘 매출', '+ 8.2%', 'assets/images/todayup.png'),
           ),
           const SizedBox(width: 15),
           Expanded(
-            child: _buildRevenueCard('이번주 매출', '+ 4.2%', 'assets/images/monthup.png', const Color(0xFF0092FF)),
+            child: _buildRevenueCard('이번주 매출', '+ 4.2%', 'assets/images/monthup.png'),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildRevenueCard(String title, String percentage, String imagePath, Color iconColor) {
+  Widget _buildRevenueCard(String title, String percentage, String imagePath) {
     return Container(
       height: 90,
       padding: const EdgeInsets.all(15),
@@ -430,9 +532,10 @@ class _MainPageState extends State<MainPage> {
               fontSize: 16,
               fontWeight: FontWeight.w400,
               color: Color(0xFF333333),
+              letterSpacing: -0.8,
             ),
           ),
-          const SizedBox(height: 0),
+          const SizedBox(height: 8),
           Row(
             children: [
               Text(
@@ -441,13 +544,15 @@ class _MainPageState extends State<MainPage> {
                   fontSize: 14,
                   fontWeight: FontWeight.w400,
                   color: Color(0xFF999999),
+                  letterSpacing: -0.7,
                 ),
               ),
-              const SizedBox(width: 100, height: 0),
-              Icon(
-                Icons.trending_up,
-                size: 35,
-                color: iconColor,
+              const SizedBox(width: 110),
+              Image.asset(
+                imagePath,
+                width: 32,
+                height: 17,
+                fit: BoxFit.contain,
               ),
             ],
           ),
@@ -492,15 +597,27 @@ class _MainPageState extends State<MainPage> {
 
   Widget _buildNavItem(String imagePath, String label, bool isSelected) {
     return GestureDetector(
-      onTap: () {
-        if (label == '광고 생성') {
-          Navigator.pushNamed(context, '/ad_creation');
-        } else if (label == '분석') {
-          Navigator.pushNamed(context, '/revenue_analysis');
-        } else if (label == '마이페이지') {
-          Navigator.pushNamed(context, '/mypage');
-        }
-      },
+             onTap: () {
+         if (label == '광고 생성') {
+           Navigator.push(context, PageRouteBuilder(
+             pageBuilder: (context, animation, secondaryAnimation) => AdCreationPage(),
+             transitionDuration: Duration.zero,
+             reverseTransitionDuration: Duration.zero,
+           ));
+         } else if (label == '분석') {
+           Navigator.push(context, PageRouteBuilder(
+             pageBuilder: (context, animation, secondaryAnimation) => RevenueAnalysisPage(),
+             transitionDuration: Duration.zero,
+             reverseTransitionDuration: Duration.zero,
+           ));
+         } else if (label == '마이페이지') {
+           Navigator.push(context, PageRouteBuilder(
+             pageBuilder: (context, animation, secondaryAnimation) => MyPage(),
+             transitionDuration: Duration.zero,
+             reverseTransitionDuration: Duration.zero,
+           ));
+         }
+       },
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -525,15 +642,24 @@ class _MainPageState extends State<MainPage> {
   }
 
   Widget _buildMicButton() {
-    return Container(
-      width: 60,
-      height: 60,
-      child: Center(
-        child: Image.asset(
-          'assets/images/mic.png',
-          width: 60,
-          height: 60,
-          fit: BoxFit.contain,
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(context, PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) => const AiChatPage(),
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
+        ));
+      },
+      child: Container(
+        width: 60,
+        height: 60,
+        child: Center(
+          child: Image.asset(
+            'assets/images/navMic.png',
+            width: 60,
+            height: 60,
+            fit: BoxFit.contain,
+          ),
         ),
       ),
     );

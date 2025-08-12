@@ -1,5 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'main_page.dart';
+
+// 전역 변수로 사용자 정보 저장
+class UserData {
+  static String name = '';
+  static String phone = '';
+  static String birthDate = '';
+  static String email = '';
+  static String businessName = '';
+  static String businessNumber = '';
+  static String businessType = '';
+  static String address = '';
+  static String businessPhone = '';
+}
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -10,351 +24,504 @@ class SignupPage extends StatefulWidget {
 
 class _SignupPageState extends State<SignupPage> {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _phoneController = TextEditingController();
-  final _businessNameController = TextEditingController();
-  final _businessAddressController = TextEditingController();
-  final _businessNumberController = TextEditingController();
-  String _selectedBusinessType = '기타';
-  bool _isAgreedToTerms = false;
+  // 각 필드의 에러 상태를 추적
+  bool _nameError = false;
+  bool _phoneError = false;
+  bool _businessPhoneError = false;
+  bool _businessNameError = false;
+  bool _businessNumberError = false; // 사업자등록번호 에러 상태
+  bool _businessTypeError = false;
+  bool _addressError = false;
+  bool _showErrors = false; // 에러 표시 여부
+  bool _termsError = false; // 이용약관 에러 상태
+
+  // 각 필드의 컨트롤러
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _businessPhoneController = TextEditingController();
+  final TextEditingController _businessNameController = TextEditingController();
+  final TextEditingController _businessNumberController = TextEditingController(); // 사업자등록번호 컨트롤러
+  final TextEditingController _businessTypeController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+  bool _agreedToTerms = false;
   
-  final List<String> _businessTypes = [
-    '기타',
-    '카페/음료',
-    '음식점',
-    '소매업',
-    '서비스업',
-    '제조업',
-  ];
+  @override
+  void initState() {
+    super.initState();
+    
+    // 각 컨트롤러에 리스너 추가하여 실시간으로 에러 상태 업데이트
+    _nameController.addListener(() {
+      if (_showErrors && _nameController.text.isNotEmpty && _nameError) {
+        setState(() {
+          _nameError = false;
+        });
+      }
+    });
+    
+    _phoneController.addListener(() {
+      if (_showErrors && _phoneController.text.isNotEmpty && _phoneError) {
+        setState(() {
+          _phoneError = false;
+        });
+      }
+    });
+    
+    _businessNameController.addListener(() {
+      if (_showErrors && _businessNameController.text.isNotEmpty && _businessNameError) {
+        setState(() {
+          _businessNameError = false;
+        });
+      }
+    });
+    
+    _businessNumberController.addListener(() {
+      if (_showErrors && _businessNumberController.text.isNotEmpty && _businessNumberError) {
+        setState(() {
+          _businessNumberError = false;
+        });
+      }
+    });
+    
+    _businessPhoneController.addListener(() {
+      if (_showErrors && _businessPhoneController.text.isNotEmpty && _businessPhoneError) {
+        setState(() {
+          _businessPhoneError = false;
+        });
+      }
+    });
+    
+    _businessTypeController.addListener(() {
+      if (_showErrors && _businessTypeController.text.isNotEmpty && _businessTypeError) {
+        setState(() {
+          _businessTypeError = false;
+        });
+      }
+    });
+    
+    _addressController.addListener(() {
+      if (_showErrors && _addressController.text.isNotEmpty && _addressError) {
+        setState(() {
+          _addressError = false;
+        });
+      }
+    });
+  }
 
   @override
   void dispose() {
     _nameController.dispose();
-    _emailController.dispose();
     _phoneController.dispose();
+    _businessPhoneController.dispose();
     _businessNameController.dispose();
     _businessNumberController.dispose();
+    _businessTypeController.dispose();
+    _addressController.dispose();
     super.dispose();
+  }
+
+  // 에러 상태 업데이트
+  void _updateErrorStates() {
+    setState(() {
+      _nameError = _nameController.text.isEmpty;
+      _phoneError = _phoneController.text.isEmpty;
+      _businessPhoneError = _businessPhoneController.text.isEmpty;
+      _businessNameError = _businessNameController.text.isEmpty;
+      _businessTypeError = _businessTypeController.text.isEmpty;
+      _addressError = _addressController.text.isEmpty;
+      _showErrors = true;
+    });
+  }
+
+  // 에러 상태 초기화
+  void _clearErrorStates() {
+    setState(() {
+      _nameError = false;
+      _phoneError = false;
+      _businessPhoneError = false;
+      _businessNameError = false;
+      _businessTypeError = false;
+      _addressError = false;
+      _showErrors = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F5FA),
-      appBar: AppBar(
-        title: const Text('회원가입'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pushReplacementNamed(context, '/login'),
-        ),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // 제목
-              Text(
-                '가입 정보',
-                style: GoogleFonts.inter(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-              ),
-              
-              const SizedBox(height: 8),
-              
-              Text(
-                'MyBiz 서비스 이용을 위한 정보를 입력해주세요',
-                style: GoogleFonts.inter(
-                  fontSize: 14,
-                  color: Colors.grey[600],
-                ),
-              ),
-              
-              const SizedBox(height: 32),
-              
-              // 개인 정보 섹션
-              _buildSectionTitle('개인 정보'),
-              
-              const SizedBox(height: 16),
-              
-              _buildInputField(
-                controller: _nameController,
-                label: '이름',
-                hint: '이름을 입력하세요',
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return '이름을 입력해주세요';
-                  }
-                  return null;
-                },
-              ),
-              
-              const SizedBox(height: 16),
-              
-              _buildInputField(
-                controller: _emailController,
-                label: '이메일',
-                hint: '이메일을 입력하세요',
-                keyboardType: TextInputType.emailAddress,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return '이메일을 입력해주세요';
-                  }
-                  if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-                    return '올바른 이메일 형식을 입력해주세요';
-                  }
-                  return null;
-                },
-              ),
-              
-              const SizedBox(height: 16),
-              
-              _buildInputField(
-                controller: _phoneController,
-                label: '휴대폰 번호',
-                hint: '휴대폰 번호를 입력하세요',
-                keyboardType: TextInputType.phone,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return '휴대폰 번호를 입력해주세요';
-                  }
-                  return null;
-                },
-              ),
-              
-              const SizedBox(height: 32),
-              
-              // 사업자 정보 섹션
-              _buildSectionTitle('사업자 정보'),
-              
-              const SizedBox(height: 16),
-
-              _buildInputField(
-                controller: _businessNameController,
-                label: '상호명',
-                hint: '상호명을 입력하세요',
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return '상호명을을 입력하세요';
-                  }
-                  return null;
-                },
-              ),
-
-              const SizedBox(height: 16),
-              
-              _buildInputField(
-                controller: _businessAddressController,
-                label: '주소',
-                hint: '주소를 입력하세요',
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return '주소를를 입력해주세요';
-                  }
-                  return null;
-                },
-              ),
-              
-              const SizedBox(height: 16),
-              
-              _buildInputField(
-                controller: _businessNumberController,
-                label: '사업자등록번호',
-                hint: '사업자등록번호를 입력하세요',
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return '사업자등록번호를 입력해주세요';
-                  }
-                  return null;
-                },
-              ),
-              
-              const SizedBox(height: 16),
-              
-              // 업종 선택
-              Text(
-                '업종',
-                style: GoogleFonts.inter(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black87,
-                ),
-              ),
-              
-              const SizedBox(height: 8),
-              
-              DropdownButtonFormField<String>(
-                value: _selectedBusinessType,
-                decoration: InputDecoration(
-                  hintText: '업종을 선택하세요',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(5),
-                    borderSide: BorderSide(color: Colors.grey[300]!),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(5),
-                    borderSide: BorderSide(color: Colors.grey[300]!),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(5),
-                    borderSide: const BorderSide(color: Color(0xFF667EEA)),
-                  ),
-                  filled: true,
-                  fillColor: Colors.white,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                ),
-                items: _businessTypes.map((String type) {
-                  return DropdownMenuItem<String>(
-                    value: type,
-                    child: Text(type),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _selectedBusinessType = newValue!;
-                  });
-                },
-              ),
-              
-              const SizedBox(height: 40),
-              
-              // 약관 동의
-              Row(
-                children: [
-                  Checkbox(
-                    value: _isAgreedToTerms,
-                    onChanged: (value) {
-                      setState(() {
-                        _isAgreedToTerms = value ?? false;
-                      });
-                    },
-                    activeColor: const Color(0xFF667EEA),
-                  ),
-                  Expanded(
-                    child: Text(
-                      '이용약관 및 개인정보처리방침에 동의합니다',
-                      style: GoogleFonts.inter(
-                        fontSize: 14,
-                        color: Colors.grey[700],
+      backgroundColor: const Color(0xFFF5F6FB),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 23),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // 상단 상태바 영역
+                Container(
+                  height: 52,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Row(
+                    children: [
+                      const Text(
+                        '9:41',
+                        style: TextStyle(
+                          fontSize: 18.9,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF444347),
+                        ),
                       ),
-                    ),
-                  ),
-                ],
-              ),
-              
-              const SizedBox(height: 32),
-              
-              // 가입하기 버튼
-              ElevatedButton(
-                onPressed: _handleSignup,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF667EEA),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                      const Spacer(),
+                      Row(
+                        children: [
+                          Image.asset(
+                            'assets/images/1.png',
+                            width: 22,
+                            height: 14,
+                            fit: BoxFit.contain,
+                          ),
+                          const SizedBox(width: 4),
+                          Image.asset(
+                            'assets/images/2.png',
+                            width: 23,
+                            height: 16,
+                            fit: BoxFit.contain,
+                          ),
+                          const SizedBox(width: 4),
+                          Image.asset(
+                            'assets/images/3.png',
+                            width: 22,
+                            height: 10,
+                            fit: BoxFit.contain,
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
-                child: Text(
-                  '가입하기',
-                  style: GoogleFonts.inter(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
+                const SizedBox(height: 20),
+                
+                // MyBiz 로고 및 설명
+                Center(
+                  child: Column(
+                    children: [
+                      ShaderMask(
+                        shaderCallback: (bounds) => const LinearGradient(
+                          colors: [Color(0xFF00AEFF), Color(0xFF0084FF)],
+                        ).createShader(bounds),
+                        child: Text(
+                          'MyBiz',
+                          style: GoogleFonts.roboto(
+                            fontSize: 52,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
+                        'MyBiz 서비스 이용을 위한 정보를 입력해주세요',
+                        style: GoogleFonts.inter(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w400,
+                          color: const Color(0xFFB1B0B5),
+                          letterSpacing: -0.9,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ),
-              
-              const SizedBox(height: 24),
-            ],
+                const SizedBox(height: 50),
+                
+                // 입력 필드들 (순서 변경: 이름-개인 전화번호-상호명-사업자등록번호-가게전화번호-업종-주소)
+                _buildInputField(
+                  label: '이름',
+                  controller: _nameController,
+                  hint: '이름을 입력해주세요',
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return '이름을 입력해주세요';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20),
+                
+                _buildInputField(
+                  label: '개인 전화번호',
+                  controller: _phoneController,
+                  hint: '01012345678',
+                  keyboardType: TextInputType.phone,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return '전화번호를 입력해주세요';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20),
+                
+                _buildInputField(
+                  label: '상호명',
+                  controller: _businessNameController,
+                  hint: '상호명을 입력해주세요',
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return '상호명을 입력해주세요';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20),
+                
+                _buildInputField(
+                  label: '사업자등록번호',
+                  controller: _businessNumberController,
+                  hint: '1234567890',
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return '사업자등록번호를 입력해주세요';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20),
+                
+                _buildInputField(
+                  label: '가게 전화번호',
+                  controller: _businessPhoneController,
+                  hint: '가게 전화번호를 입력해주세요',
+                  keyboardType: TextInputType.phone,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return '가게 전화번호를 입력해주세요';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20),
+                
+                _buildInputField(
+                  label: '업종',
+                  controller: _businessTypeController,
+                  hint: ' ',
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return '업종을 입력해주세요';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20),
+                
+                _buildInputField(
+                  label: '주소',
+                  controller: _addressController,
+                  hint: ' ',
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return '주소를 입력해주세요';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 15),
+                
+                // 이용약관 동의
+                _buildTermsAgreement(),
+                const SizedBox(height: 15),
+                
+                // MyBiz 시작하기 버튼
+                _buildStartButton(),
+                const SizedBox(height: 20),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: GoogleFonts.inter(
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
-        color: Colors.black87,
-      ),
-    );
-  }
-
   Widget _buildInputField({
-    required TextEditingController controller,
     required String label,
+    required TextEditingController controller,
     required String hint,
+    required String? Function(String?) validator,
     TextInputType? keyboardType,
-    String? Function(String?)? validator,
   }) {
+    // 각 필드의 에러 상태 확인
+    bool hasError = false;
+    if (label == '이름') hasError = _showErrors && _nameError;
+    else if (label == '개인 전화번호') hasError = _showErrors && _phoneError;
+    else if (label == '상호명') hasError = _showErrors && _businessNameError;
+    else if (label == '사업자등록번호') hasError = _showErrors && _businessNumberError;
+    else if (label == '가게 전화번호') hasError = _showErrors && _businessPhoneError;
+    else if (label == '업종') hasError = _showErrors && _businessTypeError;
+    else if (label == '주소') hasError = _showErrors && _addressError;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
           style: GoogleFonts.inter(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: Colors.black87,
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+            color: hasError ? Colors.red : const Color(0xFF999999),
+            letterSpacing: -0.8,
           ),
         ),
         const SizedBox(height: 8),
-        TextFormField(
-          controller: controller,
-          keyboardType: keyboardType,
-          validator: validator,
-          decoration: InputDecoration(
-            hintText: hint,
-            hintStyle: GoogleFonts.inter(
-              fontSize: 14,
-              color: Colors.grey[400],
+        Container(
+          height: 56,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(0),
+            border: Border.all(
+              color: hasError ? Colors.red : const Color(0xFFE5E5E5),
+              width: hasError ? 2 : 1,
             ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(5),
-              borderSide: BorderSide(color: Colors.grey[300]!),
+          ),
+          child: TextFormField(
+            controller: controller,
+            keyboardType: keyboardType,
+            // validator 제거하여 경고 문구가 나오지 않도록 함
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+              hintText: hint,
+              hintStyle: GoogleFonts.inter(
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                color: const Color(0xFFB1B0B5), // 힌트 색상은 항상 회색으로 유지
+              ),
             ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(5),
-              borderSide: BorderSide(color: Colors.grey[300]!),
+            style: GoogleFonts.inter(
+              fontSize: 16,
+              fontWeight: FontWeight.w400,
+              color: const Color(0xFF333333),
             ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(5),
-              borderSide: const BorderSide(color: Color(0xFF667EEA)),
-            ),
-            filled: true,
-            fillColor: Colors.white,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           ),
         ),
       ],
     );
   }
 
-  void _handleSignup() {
-    if (_formKey.currentState!.validate()) {
-      // 회원가입 처리 (시뮬레이션)
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('회원가입이 완료되었습니다!')),
-      );
-      
-      // 잠시 후 메인 페이지로 이동
-      Future.delayed(const Duration(seconds: 1), () {
-        Navigator.pushNamedAndRemoveUntil(
+  Widget _buildTermsAgreement() {
+    return Row(
+      children: [
+        Checkbox(
+          value: _agreedToTerms,
+          onChanged: (value) {
+            setState(() {
+              _agreedToTerms = value ?? false;
+              // 체크하면 에러 상태 해제
+              if (_agreedToTerms) {
+                _termsError = false;
+              }
+            });
+          },
+          activeColor: const Color(0xFF00AEFF),
+          side: _showErrors && _termsError 
+            ? const BorderSide(color: Colors.red, width: 2)
+            : const BorderSide(color: Color(0xFF00AEFF), width: 1),
+        ),
+        Expanded(
+          child: Text(
+            '이용약관 및 개인정보처리방침에 동의합니다.',
+            style: GoogleFonts.inter(
+              fontSize: 16,
+              fontWeight: FontWeight.w400,
+              color: _showErrors && _termsError ? Colors.red : const Color(0xFF333333),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStartButton() {
+    return GestureDetector(
+      onTap: () {
+        // 각 필드의 에러 상태 확인 및 설정
+        setState(() {
+          _showErrors = true;
+          _nameError = _nameController.text.isEmpty;
+          _phoneError = _phoneController.text.isEmpty;
+          _businessNameError = _businessNameController.text.isEmpty;
+          _businessNumberError = _businessNumberController.text.isEmpty;
+          _businessPhoneError = _businessPhoneController.text.isEmpty;
+          _businessTypeError = _businessTypeController.text.isEmpty;
+          _addressError = _addressController.text.isEmpty;
+          _termsError = !_agreedToTerms;
+        });
+
+        // 에러가 있는 경우 적절한 메시지 표시
+        if (_nameError || _phoneError || _businessNameError || _businessNumberError ||
+            _businessPhoneError || _businessTypeError || _addressError || _termsError) {
+          
+          String errorMessage = '';
+          // 입력되지 않은 정보가 있으면 "입력되지 않은 정보가 있습니다" 우선 표시
+          if (_nameError || _phoneError || _businessNameError || 
+              _businessPhoneError || _businessTypeError || _addressError) {
+            errorMessage = '입력되지 않은 정보가 있습니다.';
+          } else if (!_agreedToTerms) {
+            // 모든 정보가 입력되었는데 약관만 체크되지 않은 경우
+            errorMessage = '이용약관에 동의해주세요.';
+          }
+          
+          // 에러 메시지 표시 (간단한 SnackBar 사용)
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                errorMessage,
+                style: const TextStyle(color: Colors.white),
+              ),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 2),
+            ),
+          );
+          return;
+        }
+
+        // 모든 필드가 입력되었고 약관에 동의한 경우에만 메인 페이지로 이동
+        // 사용자 데이터 저장
+        UserData.name = _nameController.text;
+        UserData.phone = _phoneController.text;
+        UserData.businessName = _businessNameController.text;
+        UserData.businessNumber = _businessNumberController.text;
+        UserData.businessType = _businessTypeController.text;
+        UserData.address = _addressController.text;
+        UserData.businessPhone = _businessPhoneController.text;
+        
+        Navigator.pushReplacement(
           context,
-          '/main',
-          (route) => false,
+          MaterialPageRoute(builder: (context) => const MainPage()),
         );
-      });
-    }
+      },
+      child: Container(
+        width: double.infinity,
+        height: 56,
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF00AEFF), Color(0xFF0088CC)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: const Center(
+          child: Text(
+            'MyBiz 시작하기',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 } 

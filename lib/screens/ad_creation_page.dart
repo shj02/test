@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'revenue_analysis_page.dart';
 import 'mypage.dart';
+import 'ai_chat_page.dart';
 
 class AdCreationPage extends StatefulWidget {
   const AdCreationPage({super.key});
@@ -521,15 +522,24 @@ class _AdCreationPageState extends State<AdCreationPage> {
   }
 
   Widget _buildMicButton() {
-    return Container(
-      width: 60,
-      height: 60,
-      child: Center(
-        child: Image.asset(
-          'assets/images/mic.png',
-          width: 60,
-          height: 60,
-          fit: BoxFit.contain,
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(context, PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) => const AiChatPage(),
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
+        ));
+      },
+      child: Container(
+        width: 60,
+        height: 60,
+        child: Center(
+          child: Image.asset(
+            'assets/images/navMic.png',
+            width: 60,
+            height: 60,
+            fit: BoxFit.contain,
+          ),
         ),
       ),
     );

@@ -4,6 +4,7 @@ import 'main_page.dart';
 import 'ad_creation_page.dart';
 import 'revenue_analysis_page.dart';
 import 'mypage.dart';
+import 'ai_chat_page.dart';
 
 class ReviewAnalysisPage extends StatefulWidget {
   const ReviewAnalysisPage({super.key});
@@ -174,8 +175,10 @@ class _ReviewAnalysisPageState extends State<ReviewAnalysisPage> {
               onTap: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => const RevenueAnalysisPage(),
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) => const RevenueAnalysisPage(),
+                    transitionDuration: Duration.zero,
+                    reverseTransitionDuration: Duration.zero,
                   ),
                 );
               },
@@ -601,15 +604,24 @@ class _ReviewAnalysisPageState extends State<ReviewAnalysisPage> {
   }
 
   Widget _buildMicButton() {
-    return Container(
-      width: 60,
-      height: 60,
-      child: Center(
-        child: Image.asset(
-          'assets/images/mic.png',
-          width: 60,
-          height: 60,
-          fit: BoxFit.contain,
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(context, PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) => const AiChatPage(),
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
+        ));
+      },
+      child: Container(
+        width: 60,
+        height: 60,
+        child: Center(
+          child: Image.asset(
+            'assets/images/navMic.png',
+            width: 60,
+            height: 60,
+            fit: BoxFit.contain,
+          ),
         ),
       ),
     );
