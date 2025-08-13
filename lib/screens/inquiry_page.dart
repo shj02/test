@@ -21,7 +21,7 @@ class _InquiryPageState extends State<InquiryPage> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _contentController = TextEditingController();
   
-  final List<String> _inquiryTypes = ['선택', '2', '3', '4', '기타'];
+  final List<String> _inquiryTypes = ['선택', '개인정보 문의', '이용 문의', '불만/불평사항 문의', '기타'];
 
   @override
   void dispose() {

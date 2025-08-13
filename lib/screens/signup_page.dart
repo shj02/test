@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'main_page.dart';
+import 'store_search_popup.dart';
 
 // 전역 변수로 사용자 정보 저장
 class UserData {
@@ -261,37 +262,16 @@ class _SignupPageState extends State<SignupPage> {
                 ),
                 const SizedBox(height: 20),
                 
-                _buildInputField(
-                  label: '상호명',
-                  controller: _businessNameController,
-                  hint: '상호명을 입력해주세요',
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return '상호명을 입력해주세요';
-                    }
-                    return null;
-                  },
-                ),
+                _buildBusinessNumberField(),
                 const SizedBox(height: 20),
                 
-                _buildInputField(
-                  label: '사업자등록번호',
-                  controller: _businessNumberController,
-                  hint: '1234567890',
-                  keyboardType: TextInputType.number,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return '사업자등록번호를 입력해주세요';
-                    }
-                    return null;
-                  },
-                ),
+                _buildBusinessNameField(),
                 const SizedBox(height: 20),
                 
                 _buildInputField(
                   label: '가게 전화번호',
                   controller: _businessPhoneController,
-                  hint: '가게 전화번호를 입력해주세요',
+                  hint: ' ',
                   keyboardType: TextInputType.phone,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -302,30 +282,10 @@ class _SignupPageState extends State<SignupPage> {
                 ),
                 const SizedBox(height: 20),
                 
-                _buildInputField(
-                  label: '업종',
-                  controller: _businessTypeController,
-                  hint: ' ',
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return '업종을 입력해주세요';
-                    }
-                    return null;
-                  },
-                ),
+                _buildBusinessTypeField(),
                 const SizedBox(height: 20),
                 
-                _buildInputField(
-                  label: '주소',
-                  controller: _addressController,
-                  hint: ' ',
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return '주소를 입력해주세요';
-                    }
-                    return null;
-                  },
-                ),
+                _buildAddressField(),
                 const SizedBox(height: 15),
                 
                 // 이용약관 동의
@@ -340,6 +300,235 @@ class _SignupPageState extends State<SignupPage> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildBusinessNameField() {
+    bool hasError = _showErrors && _businessNameError;
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '상호명',
+          style: GoogleFonts.inter(
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+            color: hasError ? Colors.red : const Color(0xFF999999),
+            letterSpacing: -0.8,
+          ),
+        ),
+        const SizedBox(height: 8),
+        GestureDetector(
+          onTap: () {
+            _showStoreSearchPopup();
+          },
+          child: Container(
+            height: 58,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(0),
+              border: Border.all(
+                color: hasError ? Colors.red : const Color(0xFFE5E5E5),
+                width: hasError ? 2 : 1,
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      _businessNameController.text.isEmpty 
+                          ? '상호명을 검색하여 가게 정보를 확인하세요'
+                          : _businessNameController.text,
+                      style: GoogleFonts.inter(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        color: _businessNameController.text.isEmpty 
+                            ? const Color(0xFFB1B0B5)
+                            : const Color(0xFF333333),
+                      ),
+                    ),
+                  ),
+                  Icon(
+                    Icons.search,
+                    color: Colors.grey[600],
+                    size: 20,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBusinessNumberField() {
+    bool hasError = _showErrors && _businessNumberError;
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '사업자등록번호',
+          style: GoogleFonts.inter(
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+            color: hasError ? Colors.red : const Color(0xFF999999),
+            letterSpacing: -0.8,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          height: 58,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(0),
+            border: Border.all(
+              color: hasError ? Colors.red : const Color(0xFFE5E5F5),
+              width: hasError ? 2 : 1,
+            ),
+          ),
+          child: TextFormField(
+            controller: _businessNumberController,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+              hintText: '사업자등록번호를 입력하세요',
+              hintStyle: GoogleFonts.inter(
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                color: const Color(0xFFB1B0B5),
+              ),
+            ),
+            style: GoogleFonts.inter(
+              fontSize: 16,
+              fontWeight: FontWeight.w400,
+              color: const Color(0xFF333333),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBusinessTypeField() {
+    bool hasError = _showErrors && _businessTypeError;
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '업종',
+          style: GoogleFonts.inter(
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+            color: hasError ? Colors.red : const Color(0xFF999999),
+            letterSpacing: -0.8,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          width: double.infinity,
+          height: 58,
+          decoration: BoxDecoration(
+            color: const Color(0xFFF5F5F5),
+            borderRadius: BorderRadius.circular(0),
+            border: Border.all(
+              color: hasError ? Colors.red : const Color(0xFFE5E5E5),
+              width: hasError ? 2 : 1,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            child: Text(
+              _businessTypeController.text.isEmpty 
+                  ? '상호명 검색 후 자동 입력됩니다'
+                  : _businessTypeController.text,
+              style: GoogleFonts.inter(
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                color: _businessTypeController.text.isEmpty 
+                    ? const Color(0xFFB1B0B5)
+                    : const Color(0xFF333333),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAddressField() {
+    bool hasError = _showErrors && _addressError;
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '주소',
+          style: GoogleFonts.inter(
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+            color: hasError ? Colors.red : const Color(0xFF999999),
+            letterSpacing: -0.8,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          width: double.infinity,
+          height: 58,
+          decoration: BoxDecoration(
+            color: const Color(0xFFF5F5F5),
+            borderRadius: BorderRadius.circular(0),
+            border: Border.all(
+              color: hasError ? Colors.red : const Color(0xFFE5E5E5),
+              width: hasError ? 2 : 1,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            child: Text(
+              _addressController.text.isEmpty 
+                  ? '상호명 검색 후 자동 입력됩니다'
+                  : _addressController.text,
+              style: GoogleFonts.inter(
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                color: _addressController.text.isEmpty 
+                    ? const Color(0xFFB1B0B5)
+                    : const Color(0xFF333333),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showStoreSearchPopup() {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return StoreSearchPopup(
+          onStoreSelected: (name, address, businessType, businessNumber) {
+            setState(() {
+              _businessNameController.text = name;
+              _addressController.text = address;
+              _businessTypeController.text = businessType;
+              // 사업자등록번호는 자동 입력하지 않음 (이용자가 직접 입력하도록)
+              // 에러 상태 해제
+              _businessNameError = false;
+              _addressError = false;
+              _businessTypeError = false;
+            });
+          },
+        );
+      },
     );
   }
 
@@ -374,7 +563,7 @@ class _SignupPageState extends State<SignupPage> {
         ),
         const SizedBox(height: 8),
         Container(
-          height: 56,
+          height: 58,
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(0),
@@ -383,26 +572,26 @@ class _SignupPageState extends State<SignupPage> {
               width: hasError ? 2 : 1,
             ),
           ),
-          child: TextFormField(
-            controller: controller,
-            keyboardType: keyboardType,
-            // validator 제거하여 경고 문구가 나오지 않도록 함
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
-              hintText: hint,
-              hintStyle: GoogleFonts.inter(
+                      child: TextFormField(
+              controller: controller,
+              keyboardType: keyboardType,
+              // validator 제거하여 경고 문구가 나오지 않도록 함
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                hintText: hint,
+                hintStyle: GoogleFonts.inter(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
+                  color: const Color(0xFFB1B0B5), // 힌트 색상은 항상 회색으로 유지
+                ),
+              ),
+              style: GoogleFonts.inter(
                 fontSize: 16,
                 fontWeight: FontWeight.w400,
-                color: const Color(0xFFB1B0B5), // 힌트 색상은 항상 회색으로 유지
+                color: const Color(0xFF333333),
               ),
             ),
-            style: GoogleFonts.inter(
-              fontSize: 16,
-              fontWeight: FontWeight.w400,
-              color: const Color(0xFF333333),
-            ),
-          ),
         ),
       ],
     );

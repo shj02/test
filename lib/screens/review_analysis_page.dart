@@ -5,6 +5,8 @@ import 'ad_creation_page.dart';
 import 'revenue_analysis_page.dart';
 import 'mypage.dart';
 import 'ai_chat_page.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class ReviewAnalysisPage extends StatefulWidget {
   const ReviewAnalysisPage({super.key});
@@ -14,6 +16,8 @@ class ReviewAnalysisPage extends StatefulWidget {
 }
 
 class _ReviewAnalysisPageState extends State<ReviewAnalysisPage> {
+  File? _selectedImage;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,8 +48,8 @@ class _ReviewAnalysisPageState extends State<ReviewAnalysisPage> {
                     
                     const SizedBox(height: 24),
                     
-                    // 최근 등록된 리뷰
-                    _buildRecentReviews(),
+                    // 이미지 업로드 섹션
+                    _buildImageUploadSection(),
                     
                     const SizedBox(height: 24),
                     
@@ -131,15 +135,15 @@ class _ReviewAnalysisPageState extends State<ReviewAnalysisPage> {
               ),
             ),
           ),
-                                                             Align(
-                       alignment: Alignment.centerLeft,
-                       child: GestureDetector(
-              onTap: () => Navigator.pushReplacement(
-          context,
-          PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) => const MainPage(),
-            transitionDuration: Duration.zero,
-            reverseTransitionDuration: Duration.zero,
+          Align(
+          alignment: Alignment.centerLeft,
+          child: GestureDetector(
+          onTap: () => Navigator.pushReplacement(
+            context,
+            PageRouteBuilder(
+              pageBuilder: (context, animation, secondaryAnimation) => const MainPage(),
+              transitionDuration: Duration.zero,
+              reverseTransitionDuration: Duration.zero,
           ),
         ),
               child: Container(
@@ -263,24 +267,43 @@ class _ReviewAnalysisPageState extends State<ReviewAnalysisPage> {
                    decoration: BoxDecoration(
                      borderRadius: BorderRadius.circular(8),
                    ),
-                   child: ClipRRect(
-                     borderRadius: BorderRadius.circular(8),
-                     child: Image.asset(
-                       'assets/images/chart1.png',
-                       width: double.infinity,
-                       height: 30,
-                       fit: BoxFit.contain,
-                     ),
-                   ),
+                                       child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.asset(
+                        _selectedImage != null ? 'assets/images/afterChart.png' : 'assets/images/beforeChart.png',
+                        width: double.infinity,
+                        height: 30,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            width: double.infinity,
+                            height: 30,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[200],
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Center(
+                              child: Text(
+                                '차트 이미지',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
                  ),
                 const SizedBox(height: 16),
                 // 범례
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    _buildLegendItem('긍정 (75%)', const Color(0xFFC2E1FF)),
-                    _buildLegendItem('보통 (15%)', const Color(0xFFFFCB9B)),
-                    _buildLegendItem('부정 (10%)', const Color(0xFFFFBCB7)),
+                    _buildLegendItem('긍정 (${_selectedImage != null ? '75' : '0'}%)', const Color(0xFFC2E1FF)),
+                    _buildLegendItem('보통 (${_selectedImage != null ? '15' : '0'}%)', const Color(0xFFFFCB9B)),
+                    _buildLegendItem('부정 (${_selectedImage != null ? '10' : '0'}%)', const Color(0xFFFFBCB7)),
                   ],
                 ),
               ],
@@ -314,113 +337,7 @@ class _ReviewAnalysisPageState extends State<ReviewAnalysisPage> {
     );
   }
 
-  Widget _buildRecentReviews() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Text(
-              '최근 등록된 리뷰',
-              style: GoogleFonts.inter(
-                fontSize: 16,
-                fontWeight: FontWeight.w900,
-                color: const Color(0xFF333333),
-              ),
-            ),
-            const Spacer(),
-            Text(
-              '네이버',
-              style: GoogleFonts.inter(
-                fontSize: 10.2,
-                color: const Color(0xFF666666),
-              ),
-            ),
-            Container(
-              width: 1,
-              height: 12,
-              color: const Color(0xFF666666),
-              margin: const EdgeInsets.symmetric(horizontal: 8),
-            ),
-            Text(
-              '카카오',
-              style: GoogleFonts.inter(
-                fontSize: 10.3,
-                color: const Color(0xFF999999),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 16),
-        _buildReviewCard('사용자1', '맛있고 친절함', '음식도 맛있고 사장님이 정말 친절해요!', '7.27'),
-        const SizedBox(height: 12),
-        _buildReviewCard('사용자2', '집밥', '집밥같은 느낌이라 좋았습니다.', '7.27'),
-        const SizedBox(height: 12),
-        _buildReviewCard('사용자3', '양은 적지만 맛있음', '양이 조금 적은 것 같아요. 그래도 맛있어요!', '7.27'),
-      ],
-    );
-  }
 
-  Widget _buildReviewCard(String author, String tag, String content, String date) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-                             Text(
-                 author,
-                 style: GoogleFonts.inter(
-                   fontSize: 12.7,
-                   fontWeight: FontWeight.w700,
-                   color: const Color(0xFF333333),
-                 ),
-               ),
-              const Spacer(),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF2F2F2),
-                  borderRadius: BorderRadius.circular(8.75),
-                ),
-                child: Text(
-                  tag,
-                  style: GoogleFonts.inter(
-                    fontSize: 10.6,
-                    color: const Color(0xFF999999).withOpacity(0.6),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            content,
-            style: GoogleFonts.inter(
-              fontSize: 12.4,
-              color: const Color(0xFF666666),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Align(
-            alignment: Alignment.centerRight,
-            child: Text(
-              '방문일:$date',
-              style: GoogleFonts.inter(
-                fontSize: 10,
-                color: const Color(0xFF999999),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildPositivePoints() {
     return Container(
@@ -441,11 +358,39 @@ class _ReviewAnalysisPageState extends State<ReviewAnalysisPage> {
             ),
           ),
           const SizedBox(height: 20),
-          _buildPointItem('친절한 서비스', 92),
-          const SizedBox(height: 8),
-          _buildPointItem('신선한 재료', 81),
-          const SizedBox(height: 8),
-          _buildPointItem('넓고 쾌적한 공간', 87),
+                     if (_selectedImage != null) ...[
+             _buildPointItem('친절한 서비스', 92),
+             const SizedBox(height: 8),
+             _buildPointItem('신선한 재료', 81),
+             const SizedBox(height: 8),
+             _buildPointItem('넓고 쾌적한 공간', 87),
+           ] else ...[
+             SizedBox(
+               height: 120,
+               child: Center(
+                 child: Column(
+                   mainAxisAlignment: MainAxisAlignment.center,
+                   children: [
+                     Icon(
+                       Icons.image,
+                       size: 48,
+                       color: Colors.grey[400],
+                     ),
+                     const SizedBox(height: 16),
+                     Text(
+                       '리뷰 이미지를 업로드하여\n분석을 확인하세요!',
+                       textAlign: TextAlign.center,
+                       style: GoogleFonts.inter(
+                         fontSize: 14,
+                         color: Colors.grey[600],
+                         height: 1.4,
+                       ),
+                     ),
+                   ],
+                 ),
+               ),
+             ),
+           ],
         ],
       ),
     );
@@ -470,11 +415,39 @@ class _ReviewAnalysisPageState extends State<ReviewAnalysisPage> {
             ),
           ),
           const SizedBox(height: 20),
-          _buildPointItem('부족한 주차공간', 23),
-          const SizedBox(height: 8),
-          _buildPointItem('적은 음식양', 19),
-          const SizedBox(height: 8),
-          _buildPointItem('긴 대기시간', 12),
+                     if (_selectedImage != null) ...[
+             _buildPointItem('부족한 주차공간', 23),
+             const SizedBox(height: 8),
+             _buildPointItem('적은 음식양', 19),
+             const SizedBox(height: 8),
+             _buildPointItem('긴 대기시간', 12),
+           ] else ...[
+             SizedBox(
+               height: 120,
+               child: Center(
+                 child: Column(
+                   mainAxisAlignment: MainAxisAlignment.center,
+                   children: [
+                     Icon(
+                       Icons.image,
+                       size: 48,
+                       color: Colors.grey[400],
+                     ),
+                     const SizedBox(height: 16),
+                     Text(
+                       '리뷰 이미지를 업로드하여\n분석을 확인하세요!',
+                       textAlign: TextAlign.center,
+                       style: GoogleFonts.inter(
+                         fontSize: 14,
+                         color: Colors.grey[600],
+                         height: 1.4,
+                       ),
+                     ),
+                   ],
+                 ),
+               ),
+             ),
+           ],
         ],
       ),
     );
@@ -503,6 +476,97 @@ class _ReviewAnalysisPageState extends State<ReviewAnalysisPage> {
         ),
       ),
     );
+  }
+
+  Widget _buildImageUploadSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+                 Text(
+           '리뷰 분석에 사용할 이미지를 선택하세요',
+           style: GoogleFonts.inter(
+             fontSize: 16,
+             fontWeight: FontWeight.w900,
+             color: const Color(0xFF333333),
+           ),
+         ),
+        
+        const SizedBox(height: 16),
+        
+                 GestureDetector(
+           onTap: _pickImage,
+           child: Container(
+             width: double.infinity,
+             height: 200,
+             decoration: BoxDecoration(
+               color: Colors.white,
+               borderRadius: BorderRadius.circular(15),
+               border: Border.all(
+                 color: Colors.grey[300]!,
+                 width: 2,
+                 style: BorderStyle.solid,
+               ),
+             ),
+             child: Column(
+               mainAxisAlignment: MainAxisAlignment.center,
+               children: [
+                 Container(
+                   width: 60,
+                   height: 60,
+                   decoration: BoxDecoration(
+                     color: const Color(0xFF98E0F8).withOpacity(0.1),
+                     borderRadius: BorderRadius.circular(30),
+                   ),
+                   child: const Icon(
+                     Icons.add_photo_alternate,
+                     color: Color(0xFF98E0F8),
+                     size: 30,
+                   ),
+                 ),
+                 const SizedBox(height: 12),
+                 Text(
+                   '이미지를 선택하세요',
+                   style: GoogleFonts.inter(
+                     fontSize: 16,
+                     fontWeight: FontWeight.w500,
+                     color: Colors.grey[600],
+                   ),
+                 ),
+                 const SizedBox(height: 4),
+                 Text(
+                   '갤러리에서 선택',
+                   style: GoogleFonts.inter(
+                     fontSize: 12,
+                     color: Colors.grey[500],
+                   ),
+                 ),
+               ],
+             ),
+           ),
+         ),
+      ],
+    );
+  }
+
+  Future<void> _pickImage() async {
+    // 이미지가 이미 선택되어 있으면 재분석을 위해 초기화
+    if (_selectedImage != null) {
+      setState(() {
+        _selectedImage = null; // 초기화
+      });
+      await Future.delayed(const Duration(milliseconds: 300));
+    }
+    
+    // 웹에서는 임시로 이미지가 선택된 것으로 처리
+    setState(() {
+      _selectedImage = File('temp'); // 임시 파일 객체 생성
+    });
+    
+    // 이미지 선택 시 분석 결과 표시를 위한 지연 (시뮬레이션)
+    await Future.delayed(const Duration(milliseconds: 500));
+    setState(() {
+      // 분석 완료 상태로 업데이트
+    });
   }
 
   Widget _buildBottomNavigation() {

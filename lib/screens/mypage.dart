@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'dart:html' as html;
 import 'main_page.dart';
 import 'login_page.dart';
 import 'ad_creation_page.dart';
@@ -170,17 +172,69 @@ class _MyPageState extends State<MyPage> {
       child: Row(
         children: [
           // 프로필 이미지
-          Container(
-            width: 84,
-            height: 84,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(42),
-            ),
-            child: const Icon(
-              Icons.person,
-              size: 40,
-              color: Colors.grey,
+          GestureDetector(
+            onTap: () async {
+              try {
+                // 웹에서는 window.open 사용
+                html.window.open('https://smartplace.naver.com', '_blank');
+              } catch (e) {
+                // 웹이 아닌 경우 url_launcher 사용
+                try {
+                  final Uri url = Uri.parse('https://smartplace.naver.com');
+                  if (await canLaunchUrl(url)) {
+                    await launchUrl(url, mode: LaunchMode.externalApplication);
+                  } else {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('네이버 스마트플레이스를 열 수 없습니다.'),
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                    }
+                  }
+                } catch (e2) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('오류가 발생했습니다: $e2'),
+                        duration: const Duration(seconds: 3),
+                      ),
+                    );
+                  }
+                }
+              }
+            },
+            child: Container(
+              width: 84,
+              height: 84,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(42),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(42),
+                child: Image.asset(
+                  'assets/images/user.png',
+                  width: 84,
+                  height: 84,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      width: 84,
+                      height: 84,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(42),
+                      ),
+                      child: const Icon(
+                        Icons.person,
+                        size: 40,
+                        color: Colors.grey,
+                      ),
+                    );
+                  },
+                ),
+              ),
             ),
           ),
           

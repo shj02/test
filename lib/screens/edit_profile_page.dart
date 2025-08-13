@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'mypage.dart';
 import 'signup_page.dart';
+import 'store_search_popup.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key});
@@ -166,17 +167,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 ),
                 const SizedBox(height: 20),
                 
-                _buildInputField(
-                  label: '상호명',
-                  controller: _businessNameController,
-                  hint: '상호명을 입력해주세요',
-                ),
+                _buildBusinessNameField(),
                 const SizedBox(height: 20),
                 
                 _buildInputField(
                   label: '사업자등록번호',
                   controller: _businessNumberController,
-                  hint: '1234567890',
+                  hint: '사업자등록번호를 입력하세요',
                   keyboardType: TextInputType.number,
                 ),
                 const SizedBox(height: 20),
@@ -189,18 +186,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 ),
                 const SizedBox(height: 20),
                 
-                _buildInputField(
-                  label: '업종',
-                  controller: _businessTypeController,
-                  hint: '업종을 입력해주세요',
-                ),
+                _buildBusinessTypeField(),
                 const SizedBox(height: 20),
                 
-                _buildInputField(
-                  label: '주소',
-                  controller: _addressController,
-                  hint: '주소를 입력해주세요',
-                ),
+                _buildAddressField(),
                 const SizedBox(height: 30),
                 
                 // 수정완료 버튼
@@ -234,7 +223,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         ),
         const SizedBox(height: 8),
         Container(
-          height: 56,
+          height: 58,
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(0),
@@ -260,6 +249,155 @@ class _EditProfilePageState extends State<EditProfilePage> {
               fontSize: 16,
               fontWeight: FontWeight.w400,
               color: const Color(0xFF333333),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBusinessNameField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '상호명',
+          style: GoogleFonts.inter(
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+            color: const Color(0xFF999999),
+            letterSpacing: -0.8,
+          ),
+        ),
+        const SizedBox(height: 8),
+                 GestureDetector(
+           onTap: _showStoreSearchPopup,
+           child: Container(
+             height: 58,
+             width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(0),
+              border: Border.all(
+                color: const Color(0xFFE5E5E5),
+                width: 1,
+              ),
+            ),
+                         child: Padding(
+               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      _businessNameController.text.isEmpty 
+                          ? '상호명을 입력해주세요'
+                          : _businessNameController.text,
+                      style: GoogleFonts.inter(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        color: _businessNameController.text.isEmpty 
+                            ? const Color(0xFFB1B0B5)
+                            : const Color(0xFF333333),
+                      ),
+                    ),
+                  ),
+                  const Icon(
+                    Icons.search,
+                    color: Color(0xFF999999),
+                    size: 20,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBusinessTypeField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '업종',
+          style: GoogleFonts.inter(
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+            color: const Color(0xFF999999),
+            letterSpacing: -0.8,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          height: 58,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(0),
+            border: Border.all(
+              color: const Color(0xFFE5E5E5),
+              width: 1,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            child: Text(
+              _businessTypeController.text.isEmpty 
+                  ? '업종을 입력해주세요'
+                  : _businessTypeController.text,
+              style: GoogleFonts.inter(
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                color: _businessTypeController.text.isEmpty 
+                    ? const Color(0xFFB1B0B5)
+                    : const Color(0xFF333333),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAddressField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '주소',
+          style: GoogleFonts.inter(
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+            color: const Color(0xFF999999),
+            letterSpacing: -0.8,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          height: 58,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(0),
+            border: Border.all(
+              color: const Color(0xFFE5E5E5),
+              width: 1,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            child: Text(
+              _addressController.text.isEmpty 
+                  ? '주소를 입력해주세요'
+                  : _addressController.text,
+              style: GoogleFonts.inter(
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                color: _addressController.text.isEmpty 
+                    ? const Color(0xFFB1B0B5)
+                    : const Color(0xFF333333),
+              ),
             ),
           ),
         ),
@@ -320,6 +458,25 @@ class _EditProfilePageState extends State<EditProfilePage> {
        ),
      );
    }
+
+  // 상호명 검색 팝업 표시
+  void _showStoreSearchPopup() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StoreSearchPopup(
+          onStoreSelected: (String name, String address, String businessType, String businessNumber) {
+            setState(() {
+              _businessNameController.text = name;
+              _addressController.text = address;
+              _businessTypeController.text = businessType;
+              // 사업자등록번호는 빈 문자열로 전달되므로 자동으로 입력되지 않음
+            });
+          },
+        );
+      },
+    );
+  }
 
    // 취소 확인 다이얼로그 표시
    void _showCancelDialog() {
