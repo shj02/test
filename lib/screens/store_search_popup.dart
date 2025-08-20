@@ -305,14 +305,15 @@ class _StoreSearchPopupState extends State<StoreSearchPopup> {
   }
 
   Widget _buildSearchResults() {
+    final bool hasInfo = _searchResults.length >= 10;
     return Column(
       children: [
         // 10개 이상일 때 안내문 표시
-        if (_searchResults.length >= 10)
+        if (hasInfo)
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(16),
-            margin: const EdgeInsets.all(16),
+            margin: const EdgeInsets.fromLTRB(16, 12, 16, 12),
             decoration: BoxDecoration(
               color: const Color(0xFFF8F9FA),
               borderRadius: BorderRadius.circular(8),
@@ -335,7 +336,7 @@ class _StoreSearchPopupState extends State<StoreSearchPopup> {
         // 검색 결과 리스트
         Expanded(
           child: ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: EdgeInsets.fromLTRB(16, hasInfo ? 0 : 12, 16, 16),
             itemCount: _searchResults.length,
             itemBuilder: (context, index) {
               final store = _searchResults[index];

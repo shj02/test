@@ -32,77 +32,47 @@ class _InquiryPageState extends State<InquiryPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF4F5FA),
-      body: SafeArea(
-        child: Column(
-          children: [
-            _buildStatusBar(),
-            _buildAppBar(),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildTabButtons(),
-                    const SizedBox(height: 24),
-                    _isInquiryHistory ? _buildInquiryHistory() : _buildInquiryForm(),
-                    const SizedBox(height: 40),
-                  ],
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.pushReplacement(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) => const MyPage(),
+            transitionDuration: Duration.zero,
+            reverseTransitionDuration: Duration.zero,
+          ),
+        );
+        return false;
+      },
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF4F5FA),
+        body: SafeArea(
+          child: Column(
+            children: [
+              _buildAppBar(),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildTabButtons(),
+                      const SizedBox(height: 24),
+                      _isInquiryHistory ? _buildInquiryHistory() : _buildInquiryForm(),
+                      const SizedBox(height: 40),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            _buildBottomNavigation(),
-          ],
+              _buildBottomNavigation(),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildStatusBar() {
-    return Container(
-      height: 52,
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Row(
-        children: [
-          const Text(
-            '9:41',
-            style: TextStyle(
-              fontSize: 18.9,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF444347),
-            ),
-          ),
-          const Spacer(),
-          Row(
-            children: [
-              Image.asset(
-                'assets/images/1.png',
-                width: 22,
-                height: 14,
-                fit: BoxFit.contain,
-              ),
-              const SizedBox(width: 4),
-              Image.asset(
-                'assets/images/2.png',
-                width: 23,
-                height: 16,
-                fit: BoxFit.contain,
-              ),
-              const SizedBox(width: 4),
-              Image.asset(
-                'assets/images/3.png',
-                width: 22,
-                height: 10,
-                fit: BoxFit.contain,
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
+  
 
   Widget _buildAppBar() {
     return Container(

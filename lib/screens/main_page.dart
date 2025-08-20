@@ -25,7 +25,6 @@ class _MainPageState extends State<MainPage> {
         child: Column(
           children: [
             // 고정 영역 (Fix 그룹)
-            _buildStatusBar(),
             _buildLogoSection(),
             
             // 스크롤 가능한 영역
@@ -56,49 +55,7 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
-  Widget _buildStatusBar() {
-    return Container(
-      height: 52,
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Row(
-        children: [
-          const Text(
-            '9:41',
-            style: TextStyle(
-              fontSize: 18.9,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF444347),
-            ),
-          ),
-          const Spacer(),
-          Row(
-            children: [
-              Image.asset(
-                'assets/images/1.png',
-                width: 22,
-                height: 14,
-                fit: BoxFit.contain,
-              ),
-              const SizedBox(width: 4),
-              Image.asset(
-                'assets/images/2.png',
-                width: 23,
-                height: 16,
-                fit: BoxFit.contain,
-              ),
-              const SizedBox(width: 4),
-              Image.asset(
-                'assets/images/3.png',
-                width: 22,
-                height: 10,
-                fit: BoxFit.contain,
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
+  
 
   Widget _buildLogoSection() {
     return Container(
