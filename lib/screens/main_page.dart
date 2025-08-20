@@ -183,7 +183,7 @@ class _MainPageState extends State<MainPage> {
               Expanded(
                 child: _buildMenuCard(
                   '광고생성',
-                  'AI를 통한 광고 생성',
+                  'AI를 통한\n광고 생성',
                   Icons.create,
                   const Color(0xFF333333),
                   imagePath: 'assets/images/ad.png',
@@ -193,7 +193,7 @@ class _MainPageState extends State<MainPage> {
               Expanded(
                 child: _buildMenuCard(
                   '매출분석',
-                  'AI를 통한 매출분석',
+                  'AI를 통한\n매출분석',
                   Icons.trending_up,
                   const Color(0xFF333333),
                   imagePath: 'assets/images/revenue.png',
@@ -207,7 +207,7 @@ class _MainPageState extends State<MainPage> {
               Expanded(
                 child: _buildMenuCard(
                   '리뷰분석',
-                  'AI를 통한 리뷰 분석',
+                  'AI를 통한\n리뷰 분석',
                   Icons.rate_review,
                   const Color(0xFF333333),
                   imagePath: 'assets/images/review.png',
@@ -217,7 +217,7 @@ class _MainPageState extends State<MainPage> {
               Expanded(
                 child: _buildMenuCard(
                   '정부정책',
-                  '정부정책 확인',
+                  '정부정책\n확인',
                   Icons.policy,
                   const Color(0xFF333333),
                   imagePath: 'assets/images/government.png',
@@ -266,47 +266,51 @@ class _MainPageState extends State<MainPage> {
           borderRadius: BorderRadius.circular(21),
           border: Border.all(color: const Color(0xFFFCFCFD)),
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: color,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                subtitle,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                  color: Color(0xFF999999),
-                ),
-              ),
-              const Spacer(),
-              Align(
-                alignment: Alignment.centerRight,
-                child: imagePath != null
-                    ? Image.asset(
-                        imagePath,
-                        width: 48,
-                        height: 48,
-                        fit: BoxFit.contain,
-                      )
-                    : Icon(
-                        icon,
-                        size: 48,
-                        color: color.withOpacity(0.3),
-                      ),
-              ),
-            ],
-          ),
-        ),
+                 child: Padding(
+           padding: const EdgeInsets.all(20),
+           child: Row(
+             crossAxisAlignment: CrossAxisAlignment.start,
+             children: [
+               Expanded(
+                 child: Column(
+                   crossAxisAlignment: CrossAxisAlignment.start,
+                   children: [
+                     Text(
+                       title,
+                       style: TextStyle(
+                         fontSize: 20,
+                         fontWeight: FontWeight.w700,
+                         color: color,
+                       ),
+                     ),
+                     const SizedBox(height: 8),
+                     Text(
+                       subtitle,
+                       style: const TextStyle(
+                         fontSize: 16,
+                         fontWeight: FontWeight.w400,
+                         color: Color(0xFF999999),
+                       ),
+                     ),
+                   ],
+                 ),
+               ),
+               const SizedBox(width: 16),
+               imagePath != null
+                   ? Image.asset(
+                       imagePath,
+                       width: 48,
+                       height: 48,
+                       fit: BoxFit.contain,
+                     )
+                   : Icon(
+                       icon,
+                       size: 48,
+                       color: color.withOpacity(0.3),
+                     ),
+             ],
+           ),
+         ),
       ),
     );
   }
@@ -537,6 +541,7 @@ class _MainPageState extends State<MainPage> {
           ),
           const SizedBox(height: 8),
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 percentage,
@@ -547,7 +552,6 @@ class _MainPageState extends State<MainPage> {
                   letterSpacing: -0.7,
                 ),
               ),
-              const SizedBox(width: 110),
               Image.asset(
                 imagePath,
                 width: 32,

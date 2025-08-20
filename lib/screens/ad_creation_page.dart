@@ -6,6 +6,7 @@ import 'dart:io';
 import 'revenue_analysis_page.dart';
 import 'mypage.dart';
 import 'ai_chat_page.dart';
+import '../services/image_upload_service.dart';
 
 class AdCreationPage extends StatefulWidget {
   const AdCreationPage({super.key});
@@ -16,8 +17,12 @@ class AdCreationPage extends StatefulWidget {
 
 class _AdCreationPageState extends State<AdCreationPage> {
   final _requestController = TextEditingController();
-  File? _selectedImage;
+  final ImageUploadService _uploadService = ImageUploadService();
+  List<File> _selectedImages = [];
   bool _isGenerating = false;
+  bool _isUploading = false;
+  double _uploadProgress = 0.0;
+  String? _uploadError;
 
   @override
   void dispose() {
@@ -148,17 +153,17 @@ class _AdCreationPageState extends State<AdCreationPage> {
               ),
             ),
           ),
-                                                         Align(
-                     alignment: Alignment.centerLeft,
-                     child: GestureDetector(
+          Align(
+            alignment: Alignment.centerLeft,
+            child: GestureDetector(
               onTap: () => Navigator.pushReplacement(
-          context,
-          PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) => const MainPage(),
-            transitionDuration: Duration.zero,
-            reverseTransitionDuration: Duration.zero,
-          ),
-        ),
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) => const MainPage(),
+                  transitionDuration: Duration.zero,
+                  reverseTransitionDuration: Duration.zero,
+                ),
+              ),
               child: Container(
                 width: 8,
                 height: 16,
@@ -182,78 +187,202 @@ class _AdCreationPageState extends State<AdCreationPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          '광고에 사용할 이미지를 선택하세요',
-          style: GoogleFonts.inter(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: Colors.black87,
-          ),
+        Row(
+          children: [
+            Text(
+              '광고에 사용할 이미지를 선택하세요',
+              style: GoogleFonts.inter(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.black87,
+              ),
+            ),
+            const SizedBox(width: 8),
+            GestureDetector(
+              onTap: _showGuideImage,
+              child: Image.asset(
+                'assets/images/exclamation.png',
+                width: 16,
+                height: 16,
+                fit: BoxFit.contain,
+              ),
+            ),
+          ],
         ),
         
         const SizedBox(height: 12),
         
-        GestureDetector(
-          onTap: _pickImage,
-          child: Container(
+        // 이미지 미리보기 영역
+        if (_selectedImages.isNotEmpty) ...[
+          Container(
             width: double.infinity,
-            height: 200,
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: Colors.grey[300]!,
-                width: 2,
-                style: BorderStyle.solid,
+              border: Border.all(color: Colors.grey[300]!),
+            ),
+            child: Column(
+              children: [
+                // 이미지 그리드
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  padding: const EdgeInsets.all(16),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 8,
+                    mainAxisSpacing: 8,
+                    childAspectRatio: 1,
+                  ),
+                  itemCount: _selectedImages.length + (_selectedImages.length < 5 ? 1 : 0),
+                  itemBuilder: (context, index) {
+                    if (index == _selectedImages.length) {
+                      // 추가 버튼
+                      return GestureDetector(
+                        onTap: _pickImages,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.grey[100],
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.grey[300]!, style: BorderStyle.solid),
+                          ),
+                          child: const Icon(
+                            Icons.add_photo_alternate,
+                            color: Colors.grey,
+                            size: 24,
+                          ),
+                        ),
+                      );
+                    }
+                    
+                    // 이미지 미리보기
+                    return Stack(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.grey[300]!),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.file(
+                              _selectedImages[index],
+                              width: double.infinity,
+                              height: double.infinity,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                        // 삭제 버튼
+                        Positioned(
+                          top: 4,
+                          right: 4,
+                          child: GestureDetector(
+                            onTap: () => _removeImage(index),
+                            child: Container(
+                              width: 20,
+                              height: 20,
+                              decoration: const BoxDecoration(
+                                color: Colors.red,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.close,
+                                color: Colors.white,
+                                size: 14,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        ] else ...[
+          // 이미지 선택 영역
+          GestureDetector(
+            onTap: _pickImages,
+            child: Container(
+              width: double.infinity,
+              height: 200,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: Colors.grey[300]!,
+                  width: 2,
+                  style: BorderStyle.solid,
+                ),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 60,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF667EEA).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    child: const Icon(
+                      Icons.add_photo_alternate,
+                      color: Color(0xFF667EEA),
+                      size: 30,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    '이미지를 선택하세요',
+                    style: GoogleFonts.inter(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '최대 5장까지 선택 가능',
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      color: Colors.grey[500],
+                    ),
+                  ),
+                ],
               ),
             ),
-            child: _selectedImage != null
-                ? ClipRRect(
-                    borderRadius: BorderRadius.circular(14),
-                    child: Image.file(
-                      _selectedImage!,
-                      width: double.infinity,
-                      height: double.infinity,
-                      fit: BoxFit.cover,
-                    ),
-                  )
-                : Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 60,
-                        height: 60,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF667EEA).withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        child: const Icon(
-                          Icons.add_photo_alternate,
-                          color: Color(0xFF667EEA),
-                          size: 30,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        '이미지를 선택하세요',
-                        style: GoogleFonts.inter(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '갤러리에서 선택',
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          color: Colors.grey[500],
-                        ),
-                      ),
-                    ],
-                  ),
           ),
-        ),
+        ],
+        
+        // 오류 메시지
+        if (_uploadError != null) ...[
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.red[50],
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.red[200]!),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.error_outline, color: Colors.red[600], size: 20),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    _uploadError!,
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      color: Colors.red[600],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ],
     );
   }
@@ -412,15 +541,202 @@ class _AdCreationPageState extends State<AdCreationPage> {
     );
   }
 
-  Future<void> _pickImage() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-    
-    if (image != null) {
-      setState(() {
-        _selectedImage = File(image.path);
-      });
+  Future<void> _pickImages() async {
+    try {
+      // 갤러리 권한 요청
+      final hasPermission = await _uploadService.requestGalleryPermission();
+      if (!hasPermission) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('갤러리 접근 권한이 필요합니다.'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+        return;
+      }
+
+      // 이미지 선택
+      final ImagePicker picker = ImagePicker();
+      final List<XFile> images = await picker.pickMultiImage();
+      
+      if (images.isNotEmpty) {
+        // 최대 5장 제한 확인
+        if (_selectedImages.length + images.length > 5) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('최대 5장까지 선택 가능합니다.'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+          return;
+        }
+
+        // 이미지 검사 및 추가
+        List<File> validImages = [];
+        for (final image in images) {
+          final file = File(image.path);
+          
+          // 형식 검사
+          if (!_uploadService.isValidImageFormat(file.path)) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('지원하지 않는 이미지 형식입니다. (JPG, PNG, WEBP만 지원)'),
+                backgroundColor: Colors.red,
+              ),
+            );
+            continue;
+          }
+          
+          // 크기 검사
+          if (!_uploadService.isValidImageSize(file)) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('이미지 크기가 너무 큽니다. (최대 10MB)'),
+                backgroundColor: Colors.red,
+              ),
+            );
+            continue;
+          }
+          
+          validImages.add(file);
+        }
+
+        setState(() {
+          _selectedImages.addAll(validImages);
+          _uploadError = null; // 오류 메시지 초기화
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('이미지 선택 중 오류가 발생했습니다: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
+  }
+
+  void _removeImage(int index) {
+    setState(() {
+      _selectedImages.removeAt(index);
+    });
+  }
+
+  void _showGuideImage() {
+    int currentPage = 0;
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'AI 광고 생성 가이드',
+                      style: GoogleFonts.inter(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF333333),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Container(
+                      width: double.infinity,
+                      height: 300,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.grey[300]!),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: PageView(
+                          onPageChanged: (index) {
+                            setState(() {
+                              currentPage = index;
+                            });
+                          },
+                          children: [
+                            Image.asset(
+                              'assets/images/aiAdBefore.png',
+                              fit: BoxFit.contain,
+                            ),
+                            Image.asset(
+                              'assets/images/aiAdAfter.png',
+                              fit: BoxFit.contain,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    // 페이지 인디케이터
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF5999FF).withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            '${currentPage + 1}/2',
+                            style: GoogleFonts.inter(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFF5999FF),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      '광고 이미지를 업로드하면 AI가 자동으로\n최적화된 광고를 생성해드립니다.\n\n최대 5장까지 선택 가능합니다.',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                        height: 1.4,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF5999FF),
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                        child: Text(
+                          '확인',
+                          style: GoogleFonts.inter(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   Widget _buildBottomNavigation() {
@@ -546,7 +862,7 @@ class _AdCreationPageState extends State<AdCreationPage> {
   }
 
   void _generateAd() {
-    if (_selectedImage == null) {
+    if (_selectedImages.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('이미지를 선택해주세요'),

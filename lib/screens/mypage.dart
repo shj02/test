@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'dart:io';
 import 'dart:html' as html;
 import 'main_page.dart';
 import 'login_page.dart';
@@ -173,38 +175,7 @@ class _MyPageState extends State<MyPage> {
         children: [
           // 프로필 이미지
           GestureDetector(
-            onTap: () async {
-              try {
-                // 웹에서는 window.open 사용
-                html.window.open('https://smartplace.naver.com', '_blank');
-              } catch (e) {
-                // 웹이 아닌 경우 url_launcher 사용
-                try {
-                  final Uri url = Uri.parse('https://smartplace.naver.com');
-                  if (await canLaunchUrl(url)) {
-                    await launchUrl(url, mode: LaunchMode.externalApplication);
-                  } else {
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('네이버 스마트플레이스를 열 수 없습니다.'),
-                          duration: Duration(seconds: 2),
-                        ),
-                      );
-                    }
-                  }
-                } catch (e2) {
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('오류가 발생했습니다: $e2'),
-                        duration: const Duration(seconds: 3),
-                      ),
-                    );
-                  }
-                }
-              }
-            },
+            onTap: () => _launchSmartPlace(),
             child: Container(
               width: 84,
               height: 84,
@@ -686,5 +657,75 @@ class _MyPageState extends State<MyPage> {
         reverseTransitionDuration: Duration.zero,
       ),
     );
+  }
+
+  // 스마트플레이스 앱 실행 또는 웹 브라우저 열기
+  Future<void> _launchSmartPlace() async {
+    try {
+      // 스마트플레이스 앱 URL 스킴
+      const String appUrlScheme = 'naversearchapp://';
+      // 웹 URL (앱이 설치되지 않은 경우)
+      const String webUrl = 'https://smartplace.naver.com/';
+      
+      // 웹 환경인지 확인
+      if (kIsWeb) {
+        // 웹에서는 직접 웹 URL 열기
+        html.window.open(webUrl, '_blank');
+        return;
+      }
+      
+      // 모바일 환경에서 앱 실행 시도
+      if (Platform.isAndroid || Platform.isIOS) {
+        try {
+          // 먼저 앱 실행 시도
+          final Uri appUri = Uri.parse(appUrlScheme);
+          if (await canLaunchUrl(appUri)) {
+            await launchUrl(appUri, mode: LaunchMode.externalApplication);
+          } else {
+            // 앱이 설치되지 않은 경우 웹 브라우저로 열기
+            final Uri webUri = Uri.parse(webUrl);
+            if (await canLaunchUrl(webUri)) {
+              await launchUrl(webUri, mode: LaunchMode.externalApplication);
+            } else {
+              _showErrorSnackBar('스마트플레이스를 열 수 없습니다.');
+            }
+          }
+        } catch (e) {
+          // 앱 실행 실패 시 웹 브라우저로 열기
+          try {
+            final Uri webUri = Uri.parse(webUrl);
+            if (await canLaunchUrl(webUri)) {
+              await launchUrl(webUri, mode: LaunchMode.externalApplication);
+            } else {
+              _showErrorSnackBar('스마트플레이스를 열 수 없습니다.');
+            }
+          } catch (e2) {
+            _showErrorSnackBar('오류가 발생했습니다: $e2');
+          }
+        }
+      } else {
+        // 데스크톱 환경에서는 웹 브라우저로 열기
+        final Uri webUri = Uri.parse(webUrl);
+        if (await canLaunchUrl(webUri)) {
+          await launchUrl(webUri, mode: LaunchMode.externalApplication);
+        } else {
+          _showErrorSnackBar('스마트플레이스를 열 수 없습니다.');
+        }
+      }
+    } catch (e) {
+      _showErrorSnackBar('오류가 발생했습니다: $e');
+    }
+  }
+
+  // 에러 메시지 표시
+  void _showErrorSnackBar(String message) {
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
   }
 } 
